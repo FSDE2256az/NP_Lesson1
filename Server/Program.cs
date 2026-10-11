@@ -1,5 +1,6 @@
 ﻿using System.Net;
 using System.Net.Sockets;
+using System.Text;
 
 namespace Server;
 
@@ -45,6 +46,46 @@ public class Program
         Console.WriteLine($"Listener listen on {listener.RemoteEndPoint}");
 
 
+        while (true)
+        {
+            var client = listener.Accept();
+
+            clients.Add(client);
+
+            Console.WriteLine($"{listener.RemoteEndPoint} connected ....");
+
+            Task.Run(() =>
+            {
+                var buffer  = new byte[1024];
+                var len = 0;
+                var msj = string.Empty;
+
+                while (true)
+                {
+                    len = client.Receive(buffer);
+                    
+                    msj = Encoding.Default.GetString(buffer, 0, len);
+
+                    Console.WriteLine($"{listener.RemoteEndPoint} msj: {msj}");
+
+                    if(msj =="ayqa")
+                    {
+                        client.Shutdown(SocketShutdown.Both);
+                    }
+
+                    foreach (var c in clients)
+                    {
+                        if (c != client)
+                            c.Send(Encoding.Default.GetBytes(msj));
+                    }
+
+                }
+
+            });
+
+
+
+        }
 
 
     }
