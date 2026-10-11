@@ -43,7 +43,7 @@ public class Program
 
         listener.Listen(backlog);
 
-        Console.WriteLine($"Listener listen on {listener.RemoteEndPoint}");
+        Console.WriteLine($"Listener listen on {listener.LocalEndPoint}");
 
 
         while (true)
@@ -52,7 +52,7 @@ public class Program
 
             clients.Add(client);
 
-            Console.WriteLine($"{listener.RemoteEndPoint} connected ....");
+            Console.WriteLine($"{listener.LocalEndPoint} connected ....");
 
             Task.Run(() =>
             {
@@ -66,7 +66,7 @@ public class Program
                     
                     msj = Encoding.Default.GetString(buffer, 0, len);
 
-                    Console.WriteLine($"{listener.RemoteEndPoint} msj: {msj}");
+                    Console.WriteLine($"{listener.LocalEndPoint} msj: {msj}");
 
                     if(msj =="ayqa")
                     {

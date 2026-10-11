@@ -1,12 +1,63 @@
-﻿namespace Client;
+﻿using System.Net;
+using System.Text;
+using System.Net.Sockets;
+
+namespace Client;
 
 public class Program
 {
     static void Main(string[] args)
     {
-    
-    
-    
-    
+        var client = new Socket(
+            AddressFamily.InterNetwork,
+            SocketType.Stream,
+            ProtocolType.Tcp
+        );
+
+        var ip = IPAddress.Parse("127.0.0.1");
+        var port = 8005;
+
+        var serverEndPoint = new IPEndPoint(ip, port);
+
+        try
+        {
+            client.Connect(serverEndPoint);
+
+            if (client.Connected)
+            {
+                Console.WriteLine("Client connected to Server... ");
+
+                Task.Run(() =>
+                {
+                    var buffer = new byte[1024];
+                    var len = 0;
+                    var msj = string.Empty;
+
+                    while (true)
+                    {
+                        len = client.Receive(buffer);
+
+                        msj = Encoding.Default.GetString(buffer, 0, len);
+
+                        Console.WriteLine($"Msj: {msj}");
+                    }
+                });
+
+                while (true)
+                {
+                    var msj = Console.ReadLine();
+
+                    var bufer = Encoding.Default.GetBytes(msj);
+                    client.Send(bufer);
+                }
+            }
+            else
+                Console.WriteLine("Server is not avaible");
+
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine($"Ex occured: {ex.Message}");
+        }
     }
 }
